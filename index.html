@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Game with Scratch Card</title>
+    <style>
+        /* Page Background */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('images/image.png'); /* Add your background image here */
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Quiz Container */
+        .question-container {
+            background: #fff;
+            color: black;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            max-width: 500px;
+            width: 90%;
+            text-align: left;
+        }
+
+        /* Question Styling */
+        .question {
+            font-size: 22px;
+            margin-bottom: 20px;
+            padding-left: 20px; /* Align questions and answers */
+        }
+
+        /* Answer Labels */
+        label {
+            font-size: 20px;
+            display: block;
+            padding-left: 20px; /* Align answers */
+            margin: 10px 0;
+        }
+
+        /* Next Button */
+        button {
+            background: #000;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 20px;
+            margin-top: 20px;
+            display: block;
+            margin: 20px auto;
+        }
+
+        button:hover {
+            background: #333;
+        }
+
+        /* Scratch Card */
+        #scratch-card {
+            display: none;
+            position: relative;
+            margin: auto;
+            width: 300px;
+            height: 300px;
+            text-align: center;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            border-radius: 10px;
+        }
+
+        #logo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0;
+            transform: scale(0.7);  /* Start with smaller scale */
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+
+        #logo.revealed {
+            opacity: 1;
+            transform: scale(2); /* Final size after popping */
+            animation: pop 0.5s ease-in-out;
+        }
+
+        /* Pop effect animation */
+        @keyframes pop {
+            0% {
+                transform: scale(0.7);
+            }
+            50% {
+                transform: scale(2.5); /* Overshoot size */
+            }
+            100% {
+                transform: scale(2); /* Final size */
+            }
+        }
+
+        /* End Message */
+        .end-message {
+            font-size: 24px;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            padding: 30px;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            border-radius: 10px;
+            width: 100%;
+            max-width: 500px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Quiz Questions -->
+    <div class="question-container" id="q1-container">
+        <p class="question">1. Who is known as the father of computers?</p>
+        <label><input type="radio" name="q1" value="John von Neumann"> John von Neumann</label>
+        <label><input type="radio" name="q1" value="Alan Turing"> Alan Turing</label>
+        <label><input type="radio" name="q1" value="Charles Babbage"> Charles Babbage</label>
+        <button type="button" onclick="nextQuestion(1)">Next</button>
+    </div>
+
+    <div class="question-container" id="q2-container" style="display:none;">
+        <p class="question">2. Which of these is a subset of Artificial Intelligence?</p>
+        <label><input type="radio" name="q2" value="Machine Learning"> Machine Learning</label>
+        <label><input type="radio" name="q2" value="Cloud Computing"> Cloud Computing</label>
+        <label><input type="radio" name="q2" value="Blockchain"> Blockchain</label>
+        <button type="button" onclick="nextQuestion(2)">Next</button>
+    </div>
+
+    <div class="question-container" id="q3-container" style="display:none;">
+        <p class="question">3. Which software is used for data visualization?</p>
+        <label><input type="radio" name="q3" value="Excel"> Excel</label>
+        <label><input type="radio" name="q3" value="Tableau"> Tableau</label>
+        <label><input type="radio" name="q3" value="PowerPoint"> PowerPoint</label>
+        <button type="button" onclick="checkAnswers()">Submit</button>
+    </div>
+
+    <div class="end-message" id="end-message" style="display:none;">
+        <p>OOPS! Wrong answer. Better luck next time!</p>
+    </div>
+
+    <!-- Scratch Card -->
+    <div id="scratch-card">
+        <canvas id="scratch-canvas"></canvas>
+        <img id="logo" src="images/YEN-INTELLECT[1].png" alt="Logo">
+    </div>
+
+    <script>
+        const correctAnswers = {
+            q1: "Charles Babbage",
+            q2: "Machine Learning",
+            q3: "Tableau"
+        };
+
+        function nextQuestion(questionNumber) {
+            const selectedAnswer = document.querySelector(`input[name="q${questionNumber}"]:checked`);
+            if (!selectedAnswer) {
+                alert("Please select an answer!");
+                return;
+            }
+            if (selectedAnswer.value !== correctAnswers[`q${questionNumber}`]) {
+                endGame();
+                return;
+            }
+
+            document.getElementById(`q${questionNumber}-container`).style.display = "none";
+            const nextContainer = document.getElementById(`q${questionNumber + 1}-container`);
+            if (nextContainer) {
+                nextContainer.style.display = "block";
+            } else {
+                checkAnswers();
+            }
+        }
+
+        function checkAnswers() {
+            let isCorrect = true;
+            for (let question in correctAnswers) {
+                const selectedAnswer = document.querySelector(`input[name="${question}"]:checked`);
+                if (!selectedAnswer || selectedAnswer.value !== correctAnswers[question]) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+            if (!isCorrect) {
+                endGame();
+            } else {
+                revealScratchCard();
+            }
+        }
+
+        function endGame() {
+            document.getElementById("q1-container").style.display = "none";
+            document.getElementById("q2-container").style.display = "none";
+            document.getElementById("q3-container").style.display = "none";
+            document.getElementById("end-message").style.display = "block";
+        }
+
+        function revealScratchCard() {
+            document.getElementById("q3-container").style.display = "none";
+            const scratchCard = document.getElementById("scratch-card");
+            const canvas = document.getElementById("scratch-canvas");
+            const ctx = canvas.getContext("2d");
+            const logo = document.getElementById("logo");
+
+            scratchCard.style.display = "block";
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+
+            ctx.fillStyle = "#CCCCCC";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            let isDrawing = false;
+
+            canvas.addEventListener("pointerdown", startDrawing);
+            canvas.addEventListener("pointermove", draw);
+            canvas.addEventListener("pointerup", stopDrawing);
+            canvas.addEventListener("pointerleave", stopDrawing);
+
+            function startDrawing(e) {
+                isDrawing = true;
+                draw(e);
+            }
+
+            function draw(e) {
+                if (!isDrawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left || e.touches[0].clientX - rect.left;
+                const y = e.clientY - rect.top || e.touches[0].clientY - rect.top;
+
+                ctx.globalCompositeOperation = "destination-out";
+                ctx.beginPath();
+                ctx.arc(x, y, 30, 0, Math.PI * 2);
+                ctx.fill();
+                checkScratchCompletion();
+            }
+
+            function stopDrawing() {
+                isDrawing = false;
+                ctx.beginPath();
+            }
+
+            function checkScratchCompletion() {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                let totalPixels = imageData.width * imageData.height;
+                let clearPixels = 0;
+
+                for (let i = 0; i < imageData.data.length; i += 4) {
+                    if (imageData.data[i + 3] === 0) clearPixels++;
+                }
+
+                if (clearPixels / totalPixels > 0.7) {
+                    canvas.style.display = "none";
+                    logo.classList.add("revealed");
+                }
+            }
+        }
+    </script>
+</body>
+</html>
