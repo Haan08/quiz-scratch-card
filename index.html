@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz Game with Scratch Card</title>
     <style>
-        /* Page Background */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -19,7 +18,6 @@
             background-position: center;
         }
 
-        /* Quiz Container */
         .question-container {
             background: #fff;
             color: black;
@@ -31,22 +29,19 @@
             text-align: left;
         }
 
-        /* Question Styling */
         .question {
             font-size: 22px;
             margin-bottom: 20px;
-            padding-left: 20px; /* Align questions and answers */
+            padding-left: 20px;
         }
 
-        /* Answer Labels */
         label {
             font-size: 20px;
             display: block;
-            padding-left: 20px; /* Align answers */
+            padding-left: 20px;
             margin: 10px 0;
         }
 
-        /* Next Button */
         button {
             background: #000;
             color: white;
@@ -64,7 +59,6 @@
             background: #333;
         }
 
-        /* Scratch Card */
         #scratch-card {
             display: none;
             position: relative;
@@ -92,37 +86,35 @@
             height: 100%;
             z-index: 1;
             opacity: 0;
-            transform: scale(0.7);  /* Start with smaller scale */
+            transform: scale(0.7);
             transition: transform 0.5s ease, opacity 0.5s ease;
         }
 
         #logo.revealed {
             opacity: 1;
-            transform: scale(1.5); /* Final size after popping */
+            transform: scale(1.5);
             animation: pop 0.4s ease-in-out;
         }
 
-        /* Pop effect animation */
         @keyframes pop {
             0% {
                 transform: scale(0.5);
             }
             50% {
-                transform: scale(2); /* Overshoot size */
+                transform: scale(2);
             }
             100% {
-                transform: scale(1.5); /* Final size */
+                transform: scale(1.5);
             }
         }
 
-        /* End Message */
         .end-message {
             font-size: 24px;
             color: white;
             font-weight: bold;
             text-align: center;
             padding: 30px;
-            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            background-color: rgba(0, 0, 0, 0.5);
             border-radius: 10px;
             width: 100%;
             max-width: 500px;
@@ -130,7 +122,6 @@
     </style>
 </head>
 <body>
-    <!-- Quiz Questions -->
     <div class="question-container" id="q1-container">
         <p class="question">1. Who is known as the father of computers?</p>
         <label><input type="radio" name="q1" value="John von Neumann"> John von Neumann</label>
@@ -159,7 +150,6 @@
         <p>OOPS! Wrong answer. Better luck next time!</p>
     </div>
 
-    <!-- Scratch Card -->
     <div id="scratch-card">
         <canvas id="scratch-canvas"></canvas>
         <img id="logo" src="images/YEN-INTELLECT[1].png" alt="Logo">
@@ -231,11 +221,6 @@
 
             let isDrawing = false;
 
-            canvas.addEventListener("pointerdown", startDrawing);
-            canvas.addEventListener("pointermove", draw);
-            canvas.addEventListener("pointerup", stopDrawing);
-            canvas.addEventListener("pointerleave", stopDrawing);
-
             function startDrawing(e) {
                 isDrawing = true;
                 draw(e);
@@ -243,21 +228,26 @@
 
             function draw(e) {
                 if (!isDrawing) return;
+
                 const rect = canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left || e.touches[0].clientX - rect.left;
-                const y = e.clientY - rect.top || e.touches[0].clientY - rect.top;
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
 
                 ctx.globalCompositeOperation = "destination-out";
                 ctx.beginPath();
-                ctx.arc(x, y, 60, 0, Math.PI * 2);
+                ctx.arc(x, y, 30, 0, Math.PI * 2);
                 ctx.fill();
-                checkScratchCompletion();
             }
 
             function stopDrawing() {
                 isDrawing = false;
-                ctx.beginPath();
+                checkScratchCompletion();
             }
+
+            canvas.addEventListener("pointerdown", startDrawing);
+            canvas.addEventListener("pointermove", draw);
+            canvas.addEventListener("pointerup", stopDrawing);
+            canvas.addEventListener("pointerleave", stopDrawing);
 
             function checkScratchCompletion() {
                 const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
