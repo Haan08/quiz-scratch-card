@@ -98,20 +98,20 @@
 
         #logo.revealed {
             opacity: 1;
-            transform: scale(2); /* Final size after popping */
-            animation: pop 0.5s ease-in-out;
+            transform: scale(1.5); /* Final size after popping */
+            animation: pop 0.4s ease-in-out;
         }
 
         /* Pop effect animation */
         @keyframes pop {
             0% {
-                transform: scale(0.7);
+                transform: scale(0.5);
             }
             50% {
-                transform: scale(2.5); /* Overshoot size */
+                transform: scale(2); /* Overshoot size */
             }
             100% {
-                transform: scale(2); /* Final size */
+                transform: scale(1.5); /* Final size */
             }
         }
 
@@ -249,7 +249,7 @@
 
                 ctx.globalCompositeOperation = "destination-out";
                 ctx.beginPath();
-                ctx.arc(x, y, 30, 0, Math.PI * 2);
+                ctx.arc(x, y, 60, 0, Math.PI * 2);
                 ctx.fill();
                 checkScratchCompletion();
             }
